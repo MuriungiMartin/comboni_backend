@@ -40,7 +40,7 @@ router.post("/", validateCreate, async (req, res) => {
 //get all blogs (GET)
 router.get("/", async (req, res) => {
     try {
-        const [blogs] = await db.query("SELECT * FROM articles order by date desc");
+        const [blogs] = await db.query("SELECT * FROM articles order by Date_published desc");
         res.send(blogs);
     } catch (error) {
         console.error(error);
