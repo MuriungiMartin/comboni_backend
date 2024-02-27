@@ -64,9 +64,10 @@ router.post("/", validateCreate, async (req, res) => {
 // Get user by ID (GET by ID)
 router.get("/", async (req, res) => {
   try {
-    const [user] = await db.query("SELECT * FROM Users WHERE username = ?", [
+    const [user] = await db.query("SELECT * FROM Users WHERE username = ? ORDER BY id DESC LIMIT 1", [
       req.body.name,
     ]);
+    console.log('user',user)
     if (!user) {
       return res.status(404).send("User not found");
     }
@@ -74,6 +75,33 @@ router.get("/", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Error getting user");
+  }
+});
+
+//login user
+router.post("/login", async (req, res) => {
+  try {
+    const [user] = await db.query("SELECT * FROM Users WHERE username = ? ORDER BY id DESC LIMIT 1", [
+      req.body.name,
+    ]);
+    console.log('user##',user);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    const userfound = user[0];
+    console.log('user@@',userfound)
+    const validPassword = await bcrypt.compare(req.body.password, userfound.password);
+    if (!validPassword) {
+      return res.status(401).send("Invalid password");
+    }
+    console.log('user!!!',user);
+    console.log(validPassword)
+    const securityCode = 'M2Y4ZTVkOTEtMWE5Yi00YzVlLTljNGYtOTFkNmM2N2ZiMmExOjI4ZjhjNjIzLWUwMjItNGU3Ny1hYWIzLWViM2I2ZmQyZjg5ZA==|2024-02-09T20:26:18Z';//Math.floor(1000 + Math.random() * 9000);
+    const token = jwt.sign({ userId: userfound.id }, securityCode /* process.env.SECRET_KEY */);
+    res.send({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error logging in user");
   }
 });
 

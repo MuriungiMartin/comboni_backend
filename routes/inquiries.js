@@ -9,8 +9,8 @@ const validateCreate = [
     check("topic").not().isEmpty(),
     check("church_group").not().isEmpty(),
     check("name").not().isEmpty(),
-    check("phone").isEmail(),
-    check("question").isEmail(),
+    check("phone").not().isEmpty(),
+    check("question").not().isEmpty(),
 ];
 
 const validateUpdate = [
@@ -42,7 +42,7 @@ router.post("/", validateCreate, async (req, res) => {
 //get all inquiries (GET)
 router.get("/", async (req, res) => {
     try {
-        const [inquiries] = await db.query("SELECT * FROM inquiries order by date desc");
+        const [inquiries] = await db.query("SELECT * FROM inquiries order by id desc");
         res.send(inquiries);
     } catch (error) {
         console.error(error);
